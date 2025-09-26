@@ -335,7 +335,7 @@
       // 各セクションのヘッダーに設定
       document.getElementById('table1').getElementsByTagName('thead')[0].innerHTML = headerHtmlT;
       document.getElementById('table2').getElementsByTagName('thead')[0].innerHTML = headerHtmlT;
-      document.getElementById('table3').getElementsByTagName('thead')[0].innerHTML = headerHtmlT;
+      document.getElementById('table3').getElementsByTagName('thead')[0].innerHTML = headerHtmlS;
       document.getElementById('table4').getElementsByTagName('thead')[0].innerHTML = headerHtmlS;
 
       document.getElementById('table1').tBodies[0].innerHTML = '<tr class="emp dr"><td></td></tr>';
@@ -370,7 +370,7 @@
           cbreak = currentRow[1] !== previousGroupValue && currentRow[1] !== '' ? true : false;
         }
 
-        // データ行の作成 18名以下(1Col)、60名以下(1or2Col)、61名以上(1or2or3Col)
+        // データ行の作成 18名以下(1Col)、60名以下(1or2Col)、61名以上(2Col for each)
         var tableId, sectionId, rowHtml;
 
         if (players <= 18){
@@ -397,16 +397,21 @@
             tableId = 'table4'; sectionId = 'section4';
           }
         } else {
-          if (i <= 48) {
+          // 61名以上の場合: トラップ2カラム、スキート2カラム
+          if (i <= 63) {
+            // トラップ第1カラム（63名まで）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
             tableId = 'table1'; sectionId = 'section1';
-          } else if (i <= 96) {
+          } else if (i <= 126) {
+            // トラップ第2カラム（63名まで）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
             tableId = 'table2'; sectionId = 'section2';
-          } else if (i <= 126) {
-            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+          } else if (i <= 189) {
+            // スキート第1カラム（63名まで）
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
             tableId = 'table3'; sectionId = 'section3';
           } else {
+            // スキート第2カラム（63名まで）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
             tableId = 'table4'; sectionId = 'section4';
           }
@@ -579,9 +584,9 @@
             ev_stat_trap.innerHTML = 'TRAP&nbsp;&nbsp;' + item.状況;
             ev_staticon1.innerHTML = item.状況アイコン + '<div class="dscname">TRAP</div>';
             ev_staticon2.innerHTML = item.状況アイコン + '<div class="dscname">TRAP</div>';
-            ev_staticon3.innerHTML = item.状況アイコン + '<div class="dscname">TRAP</div>';
             break;
           case 'スキート':
+            ev_staticon3.innerHTML = item.状況アイコン + '<div class="dscname">SKEET</div>';
             ev_staticon4.innerHTML = item.状況アイコン + '<div class="dscname">SKEET</div>';
             ev_stat_skeet.innerHTML = 'SKEET&nbsp;' + item.状況;
             break;
