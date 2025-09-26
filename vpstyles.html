@@ -1,0 +1,540 @@
+<style>
+  meta {
+    width: device-width;
+    initial-scale: 1.0;
+    maximum-scale: 1.0;
+    user-scalable: no;
+  }
+
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'BIZ UDGothic', sans-serif;
+    letter-spacing: 0.1vw;
+    color: rgba(255, 255, 255, 1);
+    font-weight: 400;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    text-shadow: 0.1vh 0.1vh 0.1vh rgba(0, 0, 0, 0.5);
+    background: linear-gradient(270deg, #1e2569, #19115d, #2b1364, #2d0535);
+    background-size: 100% 100%;
+    height: 100vh;
+  }
+
+  /*iPhone対策、box-shadowが有効にならない対策*/
+  body {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* #section4 は右端なのでボーダー不要 */
+  #section1,
+  #section2,
+  #section3 {
+    border-right: 0.2vw solid rgba(0, 0, 0, 0.5);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  thead {
+    height: 2vh;
+    display: none;
+  }
+
+  table,
+  th,
+  td {
+    line-height: 1.8vh;
+    border-width: 0;
+    padding: 0;
+    font-size: 1.4vh;
+    font-weight: 700;
+    box-sizing: border-box;
+  }
+
+  th {
+    color: rgba(255, 255, 255, 0.3);
+    text-align: left;
+  }
+
+  #table1 thead th,
+  #table2 thead th,
+  #table3 thead th,
+  #table4 thead th {
+    padding: 0 0.1vw;
+  }
+
+  .emp {
+    height: 0.5vh;
+  }
+
+  tr.dr td {
+    padding: 0 0.1vw;
+  }
+
+  tr.dr td.rnk {
+    padding-left: 0.4vw;
+  }
+
+  .cbreak {
+    border-style: solid;
+    border-width: 2vh 0 0 0;
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .awaitico {
+    margin: 0 1vw 0 0;
+  }
+
+  .orgicon {
+    height: 3vh;
+    border-radius: 3vh;
+    display: block;
+    margin-right: 0.2vh;
+  }
+
+  #flt-qr {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height: 4vh;
+  }
+
+  .evinfo {
+    padding: 0 0 0 0.5vw;
+    font-size: 1vh;
+  }
+
+  .ename {
+    font-size: 3vh;
+    font-weight: 700;
+    padding: 0 0 0 0.5vw;
+    color: rgba(255, 255, 255, 0.9);
+    display: inline-block;
+    text-shadow: 0.4vh 0.4vh 0.4vh rgba(0, 0, 0, 0.5);
+  }
+
+  #currentTime {
+    font-size: 2vh;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 4vh;
+    padding-left: 0.5vw;
+  }
+
+  #ev_place {
+    font-size: 2vh;
+    padding: 0 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 4vh;
+  }
+
+  .stats {
+    display: none;
+  }
+
+  #title-header {
+    display: flex;
+    background-image: radial-gradient(farthest-side at 50% 0%, rgb(80 91 208 / 50%), rgba(0, 0, 0, 0));
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 0px 0px 0px 0px;
+    height: 4vh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .misc {
+    font-family: 'Ramabhadra', sans-serif;
+    display: flex;
+    align-items: flex-end;
+    color: rgba(255, 255, 255, 0.5);
+    flex-wrap: wrap;
+    position: absolute;
+    flex-direction: row-reverse;
+    bottom: 0;
+    right: 5vh;
+  }
+
+  .spo {
+    height: 2vh;
+    padding: 0 0.5vw;
+  }
+
+  .spos {
+    //display: flex; 東北総スポ対策
+    display: none;
+    flex-direction: row-reverse;
+    position: absolute;
+    bottom: 1vh;
+    right: 4vh;
+    height: 4vh;
+    align-items: center;
+  }
+
+  .dschead {
+    font-weight: 700;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .t1,
+  .t2,
+  .t3 {
+    background-image: radial-gradient(at 50% 100%, rgba(178, 25, 227, 0.7), rgba(0, 0, 0, 0.5) 70%);
+  }
+
+  .s1,
+  .s2 {
+    background-image: radial-gradient(at 50% 100%, rgba(238, 159, 53, 0.8), rgba(0, 0, 0, 0.5) 70%);
+  }
+
+  .staticon {
+    display: inline-block;
+    font-size: 1.7vh;
+  }
+
+  .dscname {
+    display: inline-block;
+    font-size: 2vh;
+    letter-spacing: 0.1vw;
+    margin-left: 0.25vw;
+    font-family: 'Ramabhadra', sans-serif;
+    text-shadow: 0.2vh 0.2vh 0.2vh rgba(0, 0, 0, 0.8);
+  }
+
+  .sqd {
+    padding-left: 0.5vw;
+    width: 12%
+  }
+
+  .rnk {
+    padding-left: 0.5vw;
+    width: 8%
+  }
+
+  .bib {
+    width: 10%
+  }
+
+  .name {
+    width: auto;
+    text-wrap: wrap;
+  }
+
+  .nat {
+    width: 16%;
+  }
+
+  .h-rnd,
+  .h-st,
+  .h-gt {
+    text-align: right;
+  }
+
+  .rnd {
+    text-align: right;
+    width: 4.75%; //100個別
+    font-weight: 700;
+    padding: 0 0.5vw;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .h-rnd,
+  .h-st,
+  .h-gt,
+  .d1,
+  .tot.d1,
+  .qso.d1 {
+    width: 5%;
+  }
+
+  .qso.d1,
+  .qso.d2 {
+    padding-left: 0.5vw;
+    font-size: 0.8vh;
+  }
+
+  .tot,
+  .st {
+    text-align: right;
+    font-weight: 700;
+    width: 4.75%; //100個別
+  }
+
+  .tot {
+    color: rgba(255, 191, 0, 1);
+  }
+
+  .st {
+    color: rgba(0, 255, 63, 1);
+  }
+
+  .qso {
+    width: 7%;
+  }
+
+  .upd,
+  .qso-upd {
+    display: none;
+  }
+
+  .hl23 {
+    color: RGB(101, 255, 255);
+  }
+
+  .hl24 {
+    color: RGB(255, 153, 229);
+    text-decoration: underline solid;
+  }
+
+  .hl25 {
+    color: RGB(255, 255, 101);
+    text-decoration: underline double;
+  }
+
+  .flgicon {
+    height: 1.5vh;
+    vertical-align: text-bottom;
+    border-radius: 1.5vh;
+    margin-right: 0.2vw;
+  }
+
+  /* sectionの奇数行 */
+  #section1 .dr:nth-child(odd),
+  #section2 .dr:nth-child(odd),
+  #section3 .dr:nth-child(odd),
+  #section4 .dr:nth-child(odd) {
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.4) inset;
+  }
+
+  @keyframes gradient-animation {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 2s ease-in-out;
+  }
+
+  #results {
+    display: flex;
+    flex-direction: row;
+    height: 92.5vh;
+  }
+
+  .section {
+    flex: 1;
+    display: block;
+    overflow-y: visible;
+  }
+
+  /*--------------------------------------------*/
+  @media (max-aspect-ratio: 15/9) {
+
+    table,
+    th,
+    td {
+      line-height: 2vh;
+      border-width: 0;
+      padding: 0;
+      font-size: 1.5vh !important;
+      font-weight: 200;
+      box-sizing: border-box;
+    }
+
+    th,
+    tr.dr td {
+      padding: 0 0.8vw !important;
+    }
+
+    tr.dr td {
+      font-size: 1.5vh !important;
+      line-height: 2.0vh !important;
+    }
+
+    .spos {
+      display: flex;
+      position: relative;
+      height: 3vh;
+      right: 0;
+      bottom: 0;
+      align-items: center;
+      flex-direction: column;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .spo {
+      display: none;
+    }
+
+    .misc {
+      position: relative;
+      bottom: 0;
+      right: 0;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .evinfo {
+      padding: 0;
+      line-height: 0;
+      padding: 0 0.25vh 0.25vh 0;
+    }
+
+    #flt-qr {
+        bottom: 0.5vh;
+        right: 1.0vw;
+        height: 4vh;
+    }
+
+    #results {
+      flex-direction: column;
+      overflow-y: auto;
+      height: 90.5vh;
+    }
+
+    .section {
+      height: auto;
+    }
+
+    #section1,
+    #section2,
+    #section3 {
+      margin-bottom: 2.8vh;
+    }
+
+    #section4 {
+      margin-bottom: 5.6vh;
+    }
+
+    /* sectionの奇数行 */
+    #section1 .dr:not(.emp):nth-child(odd),
+    #section2 .dr:not(.emp):nth-child(odd),
+    #section3 .dr:not(.emp):nth-child(odd),
+    #section4 .dr:not(.emp):nth-child(odd) {
+      box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.0) inset;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    #title-header {
+      height: 4vh;
+      display: flex;
+    }
+
+    #ev_name {
+      /* font-size: 2.5vh; 東北総スポ対策*/
+      font-size: 1.75vh;
+      text-wrap-mode: wrap;
+      text-align: center;
+    }
+
+    #ev_place {
+      line-height: 2.5vh;
+    }
+
+    #currentTime,
+    #ev_update,
+    #ev_date-days,
+    .stats {
+      display: none;
+    }
+
+    th,
+    tr.dr td {
+      padding: 0 0.8vw !important;
+      font-size: 3.8vw !important;
+      line-height: 5vw !important;
+    }
+
+    .d2-hide {
+      display: none;
+    }
+
+    .flgicon {
+      /* height: 1.5vh !important; */
+      height: 3.8vw !important;
+      vertical-align: text-bottom;
+      border-radius: 1vw;
+      margin-right: 0.5vw;
+    }
+
+    .h-rnd,
+    .h-st,
+    .h-gt,
+    .d1,
+    .tot.d1,
+    .qso.d1 {
+      width: 5%;
+    }
+
+    .qso.d1,
+    .qso.d2 {
+      font-size: 2vw !important;
+    }
+
+    .dschead.t2,.dschead.t3 {
+      display: none;
+    }
+
+    .dscname {
+      font-size: 2vh;
+      line-height: 3vh;
+    }
+
+    .staticon {
+      font-size: 1.7vh;
+    }
+  }
+
+  @keyframes blinkFast {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  .updnew,
+  .qso-updnew {
+    animation: blinkFast 1.5s infinite;
+  }
+</style>

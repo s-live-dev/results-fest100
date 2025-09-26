@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=Ramabhadra&display=swap"
+    rel="stylesheet">
+
+  <link href="https://use.fontawesome.com/releases/v6.2.0/css/all.css" rel="stylesheet">
+  <style>
+    <?!=HtmlService.createHtmlOutputFromFile('vpstyles').getContent(); ?>
+  </style>
+
+  <script>
+  </script>
+
+</head>
+
+<body>
+
+  <?!= getHeader() ?>
+
+  <?!= getFooter() ?>
+
+  <?!= getTables() ?>
+
+  <script>
+    // ヘッダー作成
+    function createHeader(headerRow,status,day){
+      var ret = '<tr>';
+      switch (status){
+        case '競技前':
+          for (var k = 0; k < headerRow.length; k++) {
+            // 列毎に表示非表示切り替え,非表示なら break のみ
+            switch (k) {
+              case 0: ret += '<th class="h-sqd">' + headerRow[0] + '</th>'; break; // 射団ID
+              case 1: break; // クラス
+              case 2: break; // 同順
+              case 3: break; // CB
+              case 4: ret += '<th class="h-bib">' + headerRow[4] + '</th>'; break; // Bib
+              case 5: ret += '<th class="h-nat">' + headerRow[6] + '</th>'; break; // Nat
+              case 6: ret += '<th class="h-name">' + headerRow[5] + '</th>'; break; // 氏名
+              // R1...R4
+              case 7:
+              case 8:
+              case 9:
+              case 10: break;
+              case 11:
+                day > 1 ? ret += '<th class="h-st d2">' + headerRow[15] + '</th>': '' ; break; // ST1
+              // R5...R8
+              case 12:
+              case 13:
+              case 14: break;
+              case 15:
+              case 16: break;
+              // GTQ
+              case 17: break;
+              // RM
+              case 18: ret += '<th class="h-qso">' +'' + '</th>'; break;
+              // GT最終更新
+              case 19: break;
+              // 摘要
+              case 20: break;
+              // SOCB等最終更新(RM)
+              case 21: break;
+              // 摘要+CB+SO
+              case 22: break;
+              default: ret += '<th>' + headerRow[k] + '</th>'; break;
+            }
+          }
+          break;
+        case '競技中':
+        case '競技終了':
+        case '1日目終了':
+          for (var k = 0; k < headerRow.length; k++) {
+            // 列毎に表示非表示切り替え,非表示なら break のみ
+            switch (k) {
+              case 0: // 射団ID
+              case 1: break; // クラス
+              case 2: ret += '<th class="h-pos">' + headerRow[2] + '</th>'; break; // 同順
+              case 3: break; // CB
+              case 4: // Bib
+                  ret += '<th class="h-bib" style="display:none">' + headerRow[4] + '</th>'; break; // スペースの都合ではBib非表示
+              case 5: // Nat
+                  ret += '<th class="h-nat">' + headerRow[6] + '</th>'; break;
+              case 6: ret += '<th class="h-name">' + headerRow[5] + '</th>'; break; // 氏名
+              // R1...R4
+              case 7:
+              case 8:
+              case 9:
+              case 10:
+                if (day>1){
+                  ret += '<th class="h-rnd d2-hide">' + headerRow[k] + '</th>';
+                };
+                if (day==1){
+                  ret += '<th class="h-rnd">' + headerRow[k] + '</th>';
+                };               
+                break;
+              case 11:
+                day > 1 ? ret += '<th class="h-st d2">' + headerRow[15] + '</th>': '' ; break; // ST1
+              // R5...R8
+              case 12:
+              case 13:
+              case 14:
+              case 15:
+                day > 1 ? ret += '<th class="h-rnd">' + headerRow[k-1] + '</th>' : '' ; break;
+              case 16:
+                day > 1 ? ret += '<th class="h-st">' + headerRow[16] + '</th>': '' ; break; // ST2
+              // GTQ
+              case 17: ret += '<th class="h-gt">' + headerRow[k] + '</th>'; break;
+              // RM
+              case 18: ret += '<th class="h-qso">' +'' + '</th>'; break;
+              // GT最終更新
+              case 19: break;
+              // 摘要
+              case 20: break;
+              // SOCB等最終更新(RM)
+              case 21: break;
+              // 摘要+CB+SO
+              case 22: break;
+              default: ret += '<th>' + headerRow[k] + '</th>'; break;
+            }
+          }
+          break;
+
+        default: ret += '<th>' + headerRow[k] + '</th>'; break;
+      }
+      ret += '</tr>';
+      return ret;
+    }
+
+    function createDataRow(currentRow,status,day,cbreak,players){
+      var ret = '<tr class="dr">';
+      if (cbreak){
+        ret = '<tr class="dr cbreak">';
+      }
+
+      switch (status) {
+        case '競技前':
+          for (var k = 0; k < currentRow.length; k++) {
+            switch (k) {
+              case 0: ret += '<td class="sqd">' + currentRow[0] + '</td>'; break; // 射団ID
+              case 1: break; // クラス
+              case 2: break; // 同順
+              case 3: break; // CB
+              case 4: ret += '<td class="bib">' + currentRow[4] + '</td>'; break;
+              case 5:
+                if (currentRow[5] ==''){
+                  ret += '<td class="nat"></td>';
+                } else {
+                  ret += '<td class="nat">'+
+                  '<img class="flgicon" src="https://s-live.org/wp-content/plugins/s-live/resource/flag/' + currentRow[6] + '.png">' +
+                  currentRow[6] + '</td>';
+                }
+                break; // 所属
+              case 6: ret += '<td class="name">' + currentRow[5] + '</td>'; break; // 氏名
+              // R1...R4
+              case 7:
+              case 8:
+              case 9:
+              case 10: break;
+              // ST1
+              case 11:
+                if(currentRow[0]!='' && day > 1){
+                  ret += '<td class="st d2">' + currentRow[15] + '</td>'
+                } else if (currentRow[0]=='' && day > 1) {
+                  ret += '<td class="st d2">' + '</td>'
+                }; break;
+              // R5...R8
+              case 12:
+              case 13:
+              case 14:
+              case 15:
+              case 16:
+              // GT
+              case 17: break;
+              case 18: ret += '<td class="qso">' + currentRow[22] + '</td>'; break; // RM
+              case 19: break; // GT最終更新
+              case 20: break; // 摘要
+              case 21: break; // SOCB等最終更新(RM)
+              case 22: break; // 摘要+CB+SO
+            }
+          }
+          break;
+        case '競技中':
+        case '競技終了':
+        case '1日目終了':
+          for (var k = 0; k < currentRow.length; k++) {
+            switch (k) {
+              case 0: break; // 射団ID
+              case 1: break; // クラス
+              case 2: ret += '<td class="rnk">' + currentRow[1] + currentRow[k] + '</td>'; break; // 同順
+              case 3: break; // CB
+              case 4: //Bib or sqd
+                if(players <= 30 && day == 1){
+                  ret += '<td class="sqd">' + currentRow[0] + '</td>';break;
+                } else {
+                  ret += '<td class="bib" style="display:none">' + currentRow[4] + players + '</td>'; break; // スペースの都合ではBib非表示
+                }
+              case 5:
+                if (currentRow[5] =='') {
+                  ret += '<td class="nat"></td>';
+                } else {
+                  ret += '<td class="nat">'+
+                  '<img class="flgicon" src="https://s-live.org/wp-content/plugins/s-live/resource/flag/' + encodeURIComponent(currentRow[6]) + '.png">' +
+                  currentRow[6] + '</td>';
+                };
+                break; // 所属
+              case 6: ret += '<td class="name">' + currentRow[5] + '</td>'; break; // 氏名
+              // R1...R4
+              case 7:
+              case 8:
+              case 9:
+              case 10:
+                if (day == 1) {
+                  switch (currentRow[k]) {
+                    case 23: ret += '<td class="hl23 rnd d1">' + currentRow[k] + '</td>'; break;
+                    case 24: ret += '<td class="hl24 rnd d1">' + currentRow[k] + '</td>'; break;
+                    case 25: ret += '<td class="hl25 rnd d1">' + currentRow[k] + '</td>'; break;
+                    default: ret += '<td class="rnd d1">' + currentRow[k] + '</td>'; break;
+                  };
+                };
+                if (day > 1) {
+                  switch (currentRow[k]) {
+                    case 23: ret += '<td class="hl23 rnd d2-hide">' + currentRow[k] + '</td>'; break;
+                    case 24: ret += '<td class="hl24 rnd d2-hide">' + currentRow[k] + '</td>'; break;
+                    case 25: ret += '<td class="hl25 rnd d2-hide">' + currentRow[k] + '</td>'; break;
+                    default: ret += '<td class="rnd d2-hide">' + currentRow[k] + '</td>'; break;
+                  };
+                };
+                break;
+              // ST1
+              case 11:
+                if(currentRow[0]!='' && day > 1){
+                  ret += '<td class="st d2">' + currentRow[15] + '</td>'
+                } else if (currentRow[0]=='' && day > 1) {
+                  ret += '<td class="st d2">' + '</td>'
+                }; break;
+              // R5...R8
+              case 12:
+              case 13:
+              case 14:
+              case 15:
+                if (day > 1) {
+                  switch (currentRow[k-1]) {
+                    case 23: ret += '<td class="hl23 rnd d2">' + currentRow[k-1] + '</td>'; break;
+                    case 24: ret += '<td class="hl24 rnd d2">' + currentRow[k-1] + '</td>'; break;
+                    case 25: ret += '<td class="hl25 rnd d2">' + currentRow[k-1] + '</td>'; break;
+                    default: ret += '<td class="rnd d2">' + currentRow[k-1] + '</td>'; break;
+                  }
+                }; break;
+              // ST2
+              case 16:
+                if(currentRow[0]!='' && day > 1){
+                  ret += '<td class="st d2">' + currentRow[16] + '</td>'
+                } else if (currentRow[0]=='' && day > 1) {
+                  ret += '<td class="st d2">' + '</td>'
+                }; break;
+              // GT
+              case 17:
+                if(currentRow[0]!='' && day == 1){
+                  ret += '<td class="tot d1">:' + currentRow[k] + '</td>';
+                } else if (currentRow[0]!='' && day > 1){
+                  ret += '<td class="tot d2">:' + currentRow[k] + '</td>';
+                } else {
+                  ret += '<td class="tot">' + currentRow[k] + '</td>';
+                } ; break;
+              case 18:
+                if(currentRow[0]!='' && day == 1){
+                  ret += '<td class="qso d1">' + currentRow[22] + '</td>';
+                } else if (currentRow[0]!='' && day > 1){
+                  ret += '<td class="qso d2">' + currentRow[22] + '</td>';
+                } else {
+                  ret += '<td class="qso">' + currentRow[22] + '</td>';
+                } ; break; // RM
+              case 19: ret += '<td class="upd">' + currentRow[k] + '</td>'; break; // GT最終更新
+              case 20: break; // 摘要
+              // case 21: ret += '<td class="qso-upd">' + currentRow[k] + '</td>'; break; // SOCB等最終更新(RM)
+              case 22: break; // 摘要+CB+SO
+              // default: ret += '<td>' + currentRow[k] + '</td>'; break;
+            }
+          }
+        break;
+      }
+      ret += '</tr>';
+      return ret;
+    }
+
+    // テーブル作成のメイン
+    function displayDataInSections(result,eventInfo) {
+
+      // 状況の値
+      var statusTrap = '競技前';
+      var statusSkeet ='競技前';
+      // ヘッダー行とデータ行で[状況]によりカラム構成を変更する
+      eventInfo.forEach(function(item) {
+        switch (item.種目) {
+          case 'トラップ': statusTrap = item.状況; break;
+          case 'スキート': statusSkeet = item.状況; break;
+        }
+      });
+
+      // 経過日数の値
+      var dayTrap = 0;
+      var daySkeet = 0;
+      // ヘッダー行とデータ行で[状況]によりカラム構成を変更する
+      eventInfo.forEach(function(item) {
+        switch (item.種目) {
+          case 'トラップ': dayTrap = item.経過日数; break;
+          case 'スキート': daySkeet = item.経過日数; break;
+        }
+      });
+
+      // 撃数と件数、トラップ優先だが、トラップのイベント設定がされていない場合はスキートが基準とする
+      var tgtqty = eventInfo[0].撃数;
+      var players = eventInfo[0].件数;
+
+      // カラムセクション
+      var section1 = document.getElementById('section1');
+      var section2 = document.getElementById('section2');
+      var section3 = document.getElementById('section3');
+      var section4 = document.getElementById('section4');
+
+      // ---- ヘッダー行
+      var headerRow = result[0];
+      var headerHtmlT = createHeader(headerRow,statusTrap,dayTrap);
+      var headerHtmlS = createHeader(headerRow,statusSkeet,daySkeet);
+
+      // 各セクションのヘッダーに設定
+      document.getElementById('table1').getElementsByTagName('thead')[0].innerHTML = headerHtmlT;
+      document.getElementById('table2').getElementsByTagName('thead')[0].innerHTML = headerHtmlT;
+      document.getElementById('table3').getElementsByTagName('thead')[0].innerHTML = headerHtmlT;
+      document.getElementById('table4').getElementsByTagName('thead')[0].innerHTML = headerHtmlS;
+
+      document.getElementById('table1').tBodies[0].innerHTML = '<tr class="emp dr"><td></td></tr>';
+      document.getElementById('table2').tBodies[0].innerHTML = '<tr class="emp dr"><td></td></tr>';
+      document.getElementById('table3').tBodies[0].innerHTML = '<tr class="emp dr"><td></td></tr>';
+      document.getElementById('table4').tBodies[0].innerHTML = '<tr class="emp dr"><td></td></tr>';
+
+      // ---- データ行
+
+      // データをセクションに振り分けて表示
+
+      // クラス分け用変数
+      var previousGroupValue = null;
+
+      for (var i = 1; i < result.length; i++) {
+
+        //　現在の行データ
+        var currentRow = result[i];
+        // クラス別表示で用いる区切り
+        var cbreak = false;
+        // 空行のHTML
+        var emptyRowHtml ='';
+
+        if (
+          // 各カラムセクションの先頭行は除外(トラップデータ行インデックス範囲は 1...126) 
+          (i != 1 && i != 43 && i <= 126 && (statusTrap == '競技中'||statusTrap == '競技終了')) ||
+          // 各カラムセクションの先頭行は除外(スキートデータ行インデックス範囲は 127...252) 
+          (i > 127 && (statusSkeet == '競技中'||statusSkeet == '競技終了'))
+        )
+        {
+          //空行追加 2列目の値(Pos)が異なり、空白ではない場合、１行分相当の上部枠線を設定
+          cbreak = currentRow[1] !== previousGroupValue && currentRow[1] !== '' ? true : false;
+        }
+
+        // データ行の作成 18名以下(1Col)、60名以下(1or2Col)、61名以上(1or2or3Col)
+        var tableId, sectionId, rowHtml;
+
+        if (players <= 18){
+          if (i <= 18) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table1'; sectionId = 'section1';
+          } else if (i <= 126) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table2'; sectionId = 'section2';
+          } else {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
+            tableId = 'table4'; sectionId = 'section4';
+          }
+        }
+        else if (players <= 60){
+          if (i <= 30) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table1'; sectionId = 'section1';
+          } else if (i <= 126) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table2'; sectionId = 'section2';
+          } else {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
+            tableId = 'table4'; sectionId = 'section4';
+          }
+        } else {
+          if (i <= 48) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table1'; sectionId = 'section1';
+          } else if (i <= 96) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table2'; sectionId = 'section2';
+          } else if (i <= 126) {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
+            tableId = 'table3'; sectionId = 'section3';
+          } else {
+            rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
+            tableId = 'table4'; sectionId = 'section4';
+          }
+        }
+        var table = document.getElementById(tableId);
+        var tbody = table.tBodies[0];
+        tbody.innerHTML += rowHtml;
+
+        var section = document.getElementById(sectionId);
+        section.appendChild(table);
+
+        previousGroupValue = currentRow[1];
+      }
+
+    }
+
+    // 現在時刻から5分以内のタイムスタンプを持つセルを点滅させる関数
+    function highlightRecentUpdates() {
+      var timeCells = document.querySelectorAll('.upd');  // 更新時刻が入っているセル
+      timeCells.forEach(function(cell) {
+        var updateTime = new Date(cell.textContent); // セルのテキストからDateオブジェクトを作成
+        var now = new Date();
+        var diff = now - updateTime; // 現在時刻との差分を計算
+
+        if (diff <= 5 * 60 * 1000) { // 5分以内なら
+          // 更新時間セルが含まれている行を取得
+          var row = cell.parentElement;
+          var columnIndexes = [14,8]; //:GT のインデックス配列、14はDay2、8はDay1
+          for (var i = 0; i < columnIndexes.length; i++) {
+            var columnIndex = columnIndexes[i];
+            var targetCell = row.cells[columnIndex];
+            if (targetCell && targetCell.textContent.trim() !== '') {
+              targetCell.classList.add('updnew'); // 最初に見つかったセルに 'updnew' クラスを追加
+              break; // 値が見つかったらループを抜ける
+            }
+          }
+        } else {
+          // 10分を超えていたら点滅クラスをすべての可能性のあるセルから削除
+          var row = cell.parentElement;
+          var columnIndexes = [14,8]; // :GT のインデックス配列、14はDay2、8はDay1
+          columnIndexes.forEach(function(columnIndex) {
+            var targetCell = row.cells[columnIndex];
+            if (targetCell) {
+              targetCell.classList.remove('updnew');
+            }
+          });
+        }
+      });
+    }
+
+    function fetchDataFromServer() {
+      function fetchData() {
+        google.script.run
+          .withSuccessHandler(function(combinedData) {
+            // eventInfoが0行でない場合のみ、以下の関数を実行する
+            if (combinedData.eventInfo.length > 0) {
+              google.script.run.withSuccessHandler(function(styleContent) {
+                if(combinedData.eventInfo[0].件数 <= 60){
+                  var head = document.head;
+                  var existingStyle = document.getElementById('vpStyleLarge');
+                  if (existingStyle) {
+                    head.removeChild(existingStyle);
+                  };
+                  var style = document.createElement('style');
+                  style.id = 'vpStyleLarge';
+                  style.innerHTML = styleContent;
+                  head.appendChild(style);
+                }
+                displayEventInfo(combinedData.eventInfo);
+                displayDataInSections(combinedData.result, combinedData.eventInfo);
+                highlightRecentUpdates();
+              }).getvpStyleLarge(combinedData.eventInfo[0].件数,combinedData.eventInfo[0].撃数);
+            } else {
+              clearEventInfo();
+              console.log('S-LIVE: No event info to display.');
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error('S-LIVE: Error fetching server data: ' + error.message);
+          })
+          .getCombinedData('<?= s ?>', '<?= sn ?>', '<?= showTest ?>');
+      }
+      // 初回のデータ取得を実行し、その後nn秒ごとに繰り返す
+      fetchData();
+      setInterval(fetchData, 0.5 * 60 * 1000); // nn秒ごとに更新
+    }
+
+    // ページのロード完了後にデータ取得を開始
+    fetchDataFromServer();
+
+    function clearEventInfo() {
+      // title-header ブロック
+      document.getElementById('ev_flag').innerHTML = '';
+      document.getElementById('ev_name').innerHTML = '<i class="fa-regular fa-circle-stop awaitico"></i>Awaiting Competition Start';
+      // footer ブロック
+      document.getElementById('ev_place').textContent = '';
+      document.getElementById('ev_weather').innerHTML = '';
+      document.getElementById('ev_update').innerHTML = '';
+      document.getElementById('ev_date-days').innerHTML = '';
+      document.getElementById('ev_stat-trap').innerHTML = '';
+      document.getElementById('ev_stat-skeet').innerHTML = '';
+      // tables ブロック
+      document.getElementById('section1').style.display = 'none';
+      document.getElementById('section2').style.display = 'none';
+      document.getElementById('section3').style.display = 'none';
+      document.getElementById('section4').style.display = 'none';
+    }
+
+    function displayEventInfo(eventInfo) {
+      // title-header ブロック
+      document.getElementById('ev_flag').innerHTML = '<img class="orgicon" src="' + eventInfo[0].旗 + '">';
+      document.getElementById('ev_name').textContent = eventInfo[0].大会名;
+      // footer ブロック
+      document.getElementById('ev_place').textContent = eventInfo[0].場所;
+      document.getElementById('ev_weather').innerHTML = eventInfo[0].気象;
+      document.getElementById('ev_update').innerHTML = eventInfo[0].最終更新;
+      document.getElementById('ev_date-days').innerHTML = eventInfo[0].開催日 + ' ' + eventInfo[0].日数;
+      document.getElementById('flt-qr').src = eventInfo[0].QR;
+
+      // tables ブロック
+      // '件数' の値に基づいてセクションの表示を切り替える
+      if (eventInfo[0].件数 <= 18) {
+        document.getElementById('section1').style.display = 'block';
+        document.getElementById('section2').style.display = 'none';
+        document.getElementById('section3').style.display = 'none';
+        document.getElementById('section4').style.display = 'block';
+      }
+      else if (eventInfo[0].件数 <= 30) {
+        document.getElementById('section1').style.display = 'block';
+        document.getElementById('section2').style.display = 'none';
+        document.getElementById('section3').style.display = 'none';
+        document.getElementById('section4').style.display = 'block';
+      }
+      else if (eventInfo[0].件数 <= 60) {
+        document.getElementById('section1').style.display = 'block';
+        document.getElementById('section2').style.display = 'block';
+        document.getElementById('section3').style.display = 'none';
+        document.getElementById('section4').style.display = 'block';
+      }
+      else if (eventInfo[0].件数 <= 96) {
+        document.getElementById('section1').style.display = 'block';
+        document.getElementById('section2').style.display = 'block';
+        document.getElementById('section3').style.display = 'none';
+        document.getElementById('section4').style.display = 'block';
+      }
+      else if (eventInfo[0].件数 <= 126) {
+        document.getElementById('section1').style.display = 'block';
+        document.getElementById('section2').style.display = 'block';
+        document.getElementById('section3').style.display = 'block';
+        document.getElementById('section4').style.display = 'block';
+      }
+      else {
+        document.getElementById('section1').style.display = 'block';
+        document.getElementById('section2').style.display = 'block';
+        document.getElementById('section3').style.display = 'block';
+        document.getElementById('section4').style.display = 'block';
+      }
+
+      // DOM要素の参照をキャッシュ
+      var ev_stat_trap = document.getElementById('ev_stat-trap');
+      var ev_stat_skeet = document.getElementById('ev_stat-skeet');
+      var ev_staticon1 = document.getElementById('ev_staticon1');
+      var ev_staticon2 = document.getElementById('ev_staticon2');
+      var ev_staticon3 = document.getElementById('ev_staticon3');
+      var ev_staticon4 = document.getElementById('ev_staticon4');
+
+      eventInfo.forEach(function(item) {
+        switch (item.種目) {
+          case 'トラップ':
+            ev_stat_trap.innerHTML = 'TRAP&nbsp;&nbsp;' + item.状況;
+            ev_staticon1.innerHTML = item.状況アイコン + '<div class="dscname">TRAP</div>';
+            ev_staticon2.innerHTML = item.状況アイコン + '<div class="dscname">TRAP</div>';
+            ev_staticon3.innerHTML = item.状況アイコン + '<div class="dscname">TRAP</div>';
+            break;
+          case 'スキート':
+            ev_staticon4.innerHTML = item.状況アイコン + '<div class="dscname">SKEET</div>';
+            ev_stat_skeet.innerHTML = 'SKEET&nbsp;' + item.状況;
+            break;
+        }
+      });
+    }
+
+    function updateClock() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var timeString = addZeroPadding(hours) + ":" + addZeroPadding(minutes) + ":" + addZeroPadding(seconds);
+      document.getElementById("currentTime").innerText = timeString;
+    }
+
+    function addZeroPadding(num) {
+      // 一桁の場合、前に0を追加
+      return num < 10 ? "0" + num : num;
+    }
+    // 1秒ごとに時刻を更新
+    setInterval(updateClock, 1000);
+    // 初回表示
+    updateClock();
+
+  </script>
+
+</body>
+
+</html>
