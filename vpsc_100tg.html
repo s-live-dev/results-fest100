@@ -398,20 +398,20 @@
           }
         } else {
           // 61名以上の場合: トラップ2カラム、スキート2カラム
-          if (i <= 63) {
-            // トラップ第1カラム（63名まで）
+          if (i <= 46) {
+            // トラップ第1カラム（46名まで）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
             tableId = 'table1'; sectionId = 'section1';
           } else if (i <= 126) {
-            // トラップ第2カラム（63名まで）
+            // トラップ第2カラム（80名まで、合計126名）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusTrap,dayTrap,cbreak,players);
             tableId = 'table2'; sectionId = 'section2';
-          } else if (i <= 189) {
-            // スキート第1カラム（63名まで）
+          } else if (i <= 169) {
+            // スキート第1カラム（43名まで、インデックス127-169）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
             tableId = 'table3'; sectionId = 'section3';
           } else {
-            // スキート第2カラム（63名まで）
+            // スキート第2カラム（43名まで、インデックス170以降）
             rowHtml = emptyRowHtml + createDataRow(currentRow,statusSkeet,daySkeet,cbreak,players);
             tableId = 'table4'; sectionId = 'section4';
           }
@@ -554,7 +554,7 @@
       else if (eventInfo[0].件数 <= 96) {
         document.getElementById('section1').style.display = 'block';
         document.getElementById('section2').style.display = 'block';
-        document.getElementById('section3').style.display = 'none';
+        document.getElementById('section3').style.display = 'block';
         document.getElementById('section4').style.display = 'block';
       }
       else if (eventInfo[0].件数 <= 126) {
